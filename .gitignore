@@ -1,1 +1,6 @@
+# raw bundler rpc call
 test.rest
+
+# test coverage
+c.out
+coverage.html

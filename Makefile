@@ -29,3 +29,8 @@ run-tests:
 	    echo "Bundler service is not running."; \
 	    exit 1; \
 	fi
+
+get-coverage:
+	go test -coverprofile=c.out ./...
+	go tool cover -html=c.out -o coverage.html
+	open coverage.html
