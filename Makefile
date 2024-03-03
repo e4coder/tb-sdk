@@ -21,4 +21,11 @@ run-golangci-lint:
 	golangci-lint run ./...
 
 run-tests:
-	go test ./...
+	@echo "Checking health of bundler..."
+	@HEALTH_CHECK=$$(curl -s "localhost:3000/health"); \
+	if [ "$$HEALTH_CHECK" = "\"ok\"" ]; then \
+	    go test -v ./...; \
+	else \
+	    echo "Bundler service is not running."; \
+	    exit 1; \
+	fi
