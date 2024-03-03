@@ -27,33 +27,33 @@ type RpcError struct {
 }
 
 type UserOp struct {
-	Sender                        string
-	Nonce                         big.Int
-	Factory                       common.Address
+	Sender                        *common.Address
+	Nonce                         *big.Int
+	Factory                       *common.Address
 	FactoryData                   []byte
 	CallData                      []byte
-	CallGasLimit                  big.Int
-	VerificationGasLimit          big.Int
-	PreVerificationGas            big.Int
-	MaxFeePerGas                  big.Int
-	MaxPriorityFeePerGas          big.Int
-	Paymaster                     common.Address
-	PaymasterVerificationGasLimit big.Int
-	PaymasterPostOpGasLimit       big.Int
+	CallGasLimit                  *big.Int
+	VerificationGasLimit          *big.Int
+	PreVerificationGas            *big.Int
+	MaxFeePerGas                  *big.Int
+	MaxPriorityFeePerGas          *big.Int
+	Paymaster                     *common.Address
+	PaymasterVerificationGasLimit *big.Int
+	PaymasterPostOpGasLimit       *big.Int
 	PaymasterData                 []byte
 	Signature                     string
 }
 
 type PackedUserOp struct {
-	Sender               string `json:"sender,omitempty"`
-	Nonce                string `json:"nonce,omitempty"`
-	InitCode             string `json:"initCode,omitempty"`
-	CallData             string `json:"callData,omitempty"`
-	Signature            string `json:"signature,omitempty"`
+	Sender               string `json:"sender"`
+	Nonce                string `json:"nonce"`
+	InitCode             string `json:"initCode"`
+	CallData             string `json:"callData"`
 	CallGasLimit         string `json:"callGasLimit,omitempty"`
 	VerificationGasLimit string `json:"verificationGasLimit,omitempty"`
 	PreVerificationGas   string `json:"preVerificationGas,omitempty"`
 	MaxFeePerGas         string `json:"maxFeePerGas,omitempty"`
 	MaxPriorityFeePerGas string `json:"maxPriorityFeePerGas,omitempty"`
-	PaymasterAndData     string `json:"paymasterAndData,omitempty"`
+	PaymasterAndData     string `json:"paymasterAndData"`
+	Signature            string `json:"signature"`
 }
