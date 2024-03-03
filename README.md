@@ -45,26 +45,26 @@ import (
 
 func main() {
     bundler := tbsdk.NewBundler()
-	err := bundler.Init("http://localhost:3000")
-	if err != nil {
-		panic(err)
-	}
+    err := bundler.Init("http://localhost:3000")
+    if err != nil {
+        panic(err)
+    }
 
-	userOp := tbsdk.NewOperationBuilder().
-		Nonce(big.NewInt(123)).
-		Sender(sender).
-		CallData(data).
-		FactoryAndData(&factoryAddress, factoryData).
-		Signature(signature).
-		Build()
+    userOp := tbsdk.NewOperationBuilder().
+        Nonce(big.NewInt(123)).
+        Sender(sender).
+        CallData(data).
+        FactoryAndData(&factoryAddress, factoryData).
+        Signature(signature).
+        Build()
 
     // RPC -> eth_estimateUserOperationGas
-	rpcResponse, err := bundler.Eth_estimateUserOperationGas(userOp)
-	if err != nil {
-		panic(err)
-	}
+    rpcResponse, err := bundler.Eth_estimateUserOperationGas(userOp)
+    if err != nil {
+        panic(err)
+    }
 
-	fmt.Println(rpcResponse.Result)
+    fmt.Println(rpcResponse.Result)
 }
 
 ```
