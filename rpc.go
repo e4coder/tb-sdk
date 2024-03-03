@@ -1,6 +1,7 @@
 package tbsdk
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -16,7 +17,13 @@ type Bundler struct {
 
 var Client *http.Client = &http.Client{}
 
-func (b *Bundler) Init() error {
+func NewBundler() *Bundler {
+	return &Bundler{}
+}
+
+func (b *Bundler) Init(rpcUri string) error {
+	b.RpcUri = rpcUri
+
 	res, err := b.Eth_chainId()
 	if err != nil {
 		return err
@@ -72,7 +79,26 @@ func (b *Bundler) Eth_supportedEntryPoints() (*RpcResponse, error) {
 	return HandleRpcRequest(request, Client)
 }
 
-func (b *Bundler) Eth_estimateUserOperationGas(userOp PackedUserOp) {
+func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcResponse, error) {
+	params := []interface{}{userOp, b.EntryPoints[0]}
+
+	request, err := PrepareRPCCall(b.RpcUri, "eth_estimateUserOperationGas", params)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := HandleRpcRequest(request, Client)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		fmt.Println(response.Error)
+
+		return response, errors.New("rpc_error")
+	}
+
+	return response, nil
 }
 
 func (b *Bundler) Eth_sendUserOperation(userOp UserOp) {}
