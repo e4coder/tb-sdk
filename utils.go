@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func PrepareRPCCall(endpoint, method string, params interface{}) (*http.Request, error) {
@@ -54,4 +56,22 @@ func HandleRpcRequest(request *http.Request, client *http.Client) (*RpcResponse,
 	}
 
 	return responseBody, nil
+}
+
+func AbiEncode(args ...[]byte) []byte {
+	encodedArgs := []byte{}
+	for _, v := range args {
+		encodedArgs = append(encodedArgs, common.LeftPadBytes(v, 32)...)
+	}
+
+	return encodedArgs
+}
+
+func AbiEncodePacked(args ...[]byte) []byte {
+	packedArgs := []byte{}
+	for _, v := range args {
+		packedArgs = append(packedArgs, v...)
+	}
+
+	return packedArgs
 }
