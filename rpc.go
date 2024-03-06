@@ -57,10 +57,8 @@ func (b *Bundler) Init(rpcUri string) error {
 	return nil
 }
 
-func (b *Bundler) Eth_chainId() (*RpcResponse, error) {
-	params := []interface{}{}
-
-	request, err := PrepareRPCCall(b.RpcUri, "eth_chainId", params)
+func (b *Bundler) _call(method string, params interface{}) (*RpcResponse, error) {
+	request, err := PrepareRPCCall(b.RpcUri, method, params)
 	if err != nil {
 		return nil, err
 	}
@@ -68,26 +66,21 @@ func (b *Bundler) Eth_chainId() (*RpcResponse, error) {
 	return HandleRpcRequest(request, Client)
 }
 
+func (b *Bundler) Eth_chainId() (*RpcResponse, error) {
+	params := []interface{}{}
+	return b._call("eth_chainId", params)
+}
+
 func (b *Bundler) Eth_supportedEntryPoints() (*RpcResponse, error) {
 	params := []interface{}{}
-
-	request, err := PrepareRPCCall(b.RpcUri, "eth_supportedEntryPoints", params)
-	if err != nil {
-		return nil, err
-	}
-
-	return HandleRpcRequest(request, Client)
+	return b._call("eth_supportedEntryPoints", params)
 }
 
 func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcResponse, error) {
 	params := []interface{}{userOp, b.EntryPoints[0]}
 
-	request, err := PrepareRPCCall(b.RpcUri, "eth_estimateUserOperationGas", params)
-	if err != nil {
-		return nil, err
-	}
+	response, err := b._call("eth_estimateUserOperationGas", params)
 
-	response, err := HandleRpcRequest(request, Client)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +94,61 @@ func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcRespon
 	return response, nil
 }
 
-func (b *Bundler) Eth_sendUserOperation(userOp UserOp) {}
+func (b *Bundler) Eth_sendUserOperation(userOp UserOp) (*RpcResponse, error) {
+	params := []interface{}{userOp, b.EntryPoints[0]}
 
-func (b *Bundler) Eth_getUserOperationByHash() {}
+	response, err := b._call("eth_sendUserOperation", params)
 
-func (b *Bundler) Eth_getUserOperationReceipt() {}
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		fmt.Println(response.Error)
+
+		return response, errors.New("rpc_error")
+	}
+
+	return response, nil
+}
+
+func (b *Bundler) Eth_getUserOperationByHash(userOpHash string) (*RpcResponse, error) {
+	params := []interface{}{userOpHash}
+
+	response, err := b._call("eth_getUserOperationByHash", params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		fmt.Println(response.Error)
+
+		return response, errors.New("rpc_error")
+	}
+
+	return response, nil
+}
+
+func (b *Bundler) Eth_getUserOperationReceipt(userOpHash string) (*RpcResponse, error) {
+	params := []interface{}{userOpHash}
+
+	response, err := b._call("eth_getUserOperationReceipt", params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		fmt.Println(response.Error)
+
+		return response, errors.New("rpc_error")
+	}
+
+	return response, nil
+}
+
+// TODO Debug_ implement namespace
 
 func (b *Bundler) Debug_clearState() {}
 

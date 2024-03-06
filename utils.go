@@ -58,6 +58,7 @@ func HandleRpcRequest(request *http.Request, client *http.Client) (*RpcResponse,
 	return responseBody, nil
 }
 
+// TODO: input type ...interface{} output ([]byte, error)
 func AbiEncode(args ...[]byte) []byte {
 	encodedArgs := []byte{}
 	for _, v := range args {
@@ -67,6 +68,7 @@ func AbiEncode(args ...[]byte) []byte {
 	return encodedArgs
 }
 
+// TODO: input type ...interface{} output ([]byte, error)
 func AbiEncodePacked(args ...[]byte) []byte {
 	packedArgs := []byte{}
 	for _, v := range args {

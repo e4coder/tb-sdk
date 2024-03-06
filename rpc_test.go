@@ -64,39 +64,146 @@ func TestBundlerInit(t *testing.T) {
 	}
 }
 
-func TestEstimateUserOpGas(t *testing.T) {
-	// TODO! counterfactual address requires bytecode
+const ABI_ACCOUNT = `[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "dest",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "func",
+                "type": "bytes"
+            }
+        ],
+        "name": "execute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]`
 
-	// err := Bundler.Init()
+func TestEstimateUserOpGasNewAccount(t *testing.T) {
+	// sign := "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c"
+
+	// factoryABI, err := abi.JSON(strings.NewReader(ABI_FACTORY))
 	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.Log(err)
+	// 	t.FailNow()
+	// }
+	// accountFACTORY, err := abi.JSON(strings.NewReader(ABI_ACCOUNT))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.Log(err)
 	// 	t.FailNow()
 	// }
 
-	// factoryAddress := common.HexToAddress("0x1B4eBFb69B8B9A085A0483981a46Ff5AE0a1a135")
-	// a, _ := abi.JSON(strings.NewReader(ABI))
-	// data, _ := PackABIData(&a)
-	// sender := common.Address{}
-	// b, _ := abi.JSON(strings.NewReader(ABI_FACTORY))
-	// owner := common.HexToAddress("0xc1a2ae5c7695314cb6cab404efd2b404c8747bd2")
-	// data2, err := PackFactoryData(&b, &owner)
+	// err = Bundler.Init("http://localhost:3000")
 	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.FailNow()
+	// }
+	// factoryAddress := common.HexToAddress("0x4BBa2E1c4856228c0572f7b64f14916E2F091391")
+	// // accountAddress := common.HexToAddress("0xd40aeab1d9e7c57523c2f5381f79c9738a73fe2d")
+	// owner := common.HexToAddress("0xB77e8533ce316AC7355191bf775F1Be1967650eD")
+
+	// callData, err := PackABIData(&accountFACTORY)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.Log(err)
+	// 	t.FailNow()
+	// }
+	// t.Log("call data")
+	// t.Log(callData)
+	// var salt32 [32]byte
+	// salt, _ := hex.DecodeString("0000000000000000000000000000000000000000000000000000000000000002")
+	// copy(salt32[:], salt[:32])
+
+	// factory := factoryAddress.Bytes()
+	// ar, _ := hex.DecodeString("F235B58DC3b2169136A857B06aaedcE1aEC4c667")
+	// ep, _ := hex.DecodeString("8024A70A99d35FF24Cacc861e946945530ee96A3")
+	// creationCode, _ := hex.DecodeString(TestAccountContractCreationCode)
+
+	// initCode := tbsdk.AbiEncodePacked(creationCode, tbsdk.AbiEncode(
+	// 	owner.Bytes(),
+	// 	ar,
+	// 	ep,
+	// 	factory,
+	// ))
+
+	// account := tbsdk.ComputeCounterfactualAddress(owner.Bytes(), salt, initCode)
+	// accountAddress := common.HexToAddress(account)
+
+	// factoryData, err := PackFactoryData(&factoryABI, &accountAddress, salt32)
+	// if err != nil {
+	// 	fmt.Println(err)
 	// 	t.Log(err)
 	// 	t.FailNow()
 	// }
 
 	// userOp := tbsdk.NewOperationBuilder().
 	// 	Nonce(big.NewInt(123)).
-	// 	Sender(&sender).
-	// 	CallData(data).
-	// 	FactoryAndData(&factoryAddress, data2).
-	// 	Signature("0x25d0a5e9d0c038f9c7c0a094b6e2a591ed8a38e8f478b65c0f14c92b0e6b0d45024daab7f8bfad5b3079234dcb155ed3fbc2bf3a8d194f9b9e1b56f1c3f9e1b1c1").
+	// 	Sender(&accountAddress).
+	// 	CallData(callData).
+	// 	FactoryAndData(&factoryAddress, factoryData).
+	// 	Signature(sign).
 	// 	Build()
 
 	// _, err = Bundler.Eth_estimateUserOperationGas(userOp)
 	// if err != nil {
+	// 	fmt.Println(err)
 	// 	uo, _ := json.MarshalIndent(userOp, "", "  ")
 	// 	t.Log(string(uo))
 	// 	t.FailNow()
 	// }
 
+}
+
+func TestEstimateUserOpGasExistingAccount(t *testing.T) {
+	// sign := "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c"
+	// accountFACTORY, err := abi.JSON(strings.NewReader(ABI_ACCOUNT))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.Log(err)
+	// 	t.FailNow()
+	// }
+
+	// err = Bundler.Init("http://localhost:3000")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.FailNow()
+	// }
+	// accountAddress := common.HexToAddress("0xd40aeab1d9e7c57523c2f5381f79c9738a73fe2d")
+
+	// callData, err := PackABIData(&accountFACTORY)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	t.Log(err)
+	// 	t.FailNow()
+	// }
+	// t.Log("call data")
+	// t.Log(callData)
+
+	// userOp := tbsdk.NewOperationBuilder().
+	// 	Nonce(big.NewInt(123)).
+	// 	Sender(&accountAddress).
+	// 	CallData(callData).
+	// 	Signature(sign).
+	// 	Build()
+
+	// _, err = Bundler.Eth_estimateUserOperationGas(userOp)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	uo, _ := json.MarshalIndent(userOp, "", "  ")
+	// 	t.Log(string(uo))
+	// 	t.FailNow()
+	// }
 }

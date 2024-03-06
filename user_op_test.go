@@ -13,15 +13,13 @@ import (
 const ABI = `[{"constant":false,"inputs":[{"name":"_address","type":"address"},{"name":"_value","type":"uint256"}],"name":"Deposit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]`
 const ABI_FACTORY = `[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"bytes32","name":"salt","type":"bytes32"}],"name":"createAccount","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"}]`
 
-func PackABIData(abi *abi.ABI) ([]byte, error) {
-	data, err := abi.Pack("Deposit", common.MaxAddress, big.NewInt(100000000))
+func PackCallData(abi *abi.ABI) ([]byte, error) {
+	data, err := abi.Pack("execute", common.MaxAddress, big.NewInt(100000000), []byte{})
 
 	return data, err
 }
 
-func PackFactoryData(abi *abi.ABI, addr *common.Address) ([]byte, error) {
-	salt := [32]byte{}
-
+func PackFactoryData(abi *abi.ABI, addr *common.Address, salt [32]byte) ([]byte, error) {
 	data, err := abi.Pack("createAccount", addr, salt)
 
 	return data, err
@@ -29,10 +27,10 @@ func PackFactoryData(abi *abi.ABI, addr *common.Address) ([]byte, error) {
 
 func TestBuilder(t *testing.T) {
 	a, _ := abi.JSON(strings.NewReader(ABI))
-	data, _ := PackABIData(&a)
+	data, _ := PackCallData(&a)
 
 	b, _ := abi.JSON(strings.NewReader(ABI_FACTORY))
-	data2, _ := PackABIData(&b)
+	data2, _ := PackCallData(&b)
 
 	addr23 := common.BigToAddress(big.NewInt(23))
 
