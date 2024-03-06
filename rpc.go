@@ -94,7 +94,7 @@ func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcRespon
 	return response, nil
 }
 
-func (b *Bundler) Eth_sendUserOperation(userOp UserOp) (*RpcResponse, error) {
+func (b *Bundler) Eth_sendUserOperation(userOp *PackedUserOp) (*RpcResponse, error) {
 	params := []interface{}{userOp, b.EntryPoints[0]}
 
 	response, err := b._call("eth_sendUserOperation", params)
