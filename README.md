@@ -17,9 +17,9 @@ Methods defined by the [ERC-4337 spec](https://github.com/eth-infinitism/account
 | `eth_chainId` | ✅ |
 | `eth_supportedEntryPoints` | ✅ |
 | `eth_estimateUserOperationGas` | ✅ |
-| `eth_sendUserOperation` | 🚧 |
-| `eth_getUserOperationByHash` | 🚧 |
-| `eth_getUserOperationReceipt` | 🚧 |
+| `eth_sendUserOperation` | ✅ |
+| `eth_getUserOperationByHash` | ✅ |
+| `eth_getUserOperationReceipt` | ✅ |
 
 ### `debug_` Namespace
 
@@ -36,6 +36,7 @@ Method defined by the [ERC-4337 spec](https://github.com/eth-infinitism/account-
 | `debug_bundler_addUserOps` | 🚧 | |
 
 ## Sample Usage
+### - Bundler
 ```go
 package main
 
@@ -65,6 +66,41 @@ func main() {
     }
 
     fmt.Println(rpcResponse.Result)
+}
+
+```
+
+### - CounterfactualAddress
+```go
+package main
+
+import (
+    tbsdk "github.com/e4coder/tb-sdk"
+)
+
+func main() {
+	owner, _ := hex.DecodeString("494E8f1c10bb14Bea02C2f16cFB33a84BC57ef74")
+	factory, _ := hex.DecodeString("4BBa2E1c4856228c0572f7b64f14916E2F091391")
+	ar, _ := hex.DecodeString("F235B58DC3b2169136A857B06aaedcE1aEC4c667")
+	ep, _ := hex.DecodeString("8024A70A99d35FF24Cacc861e946945530ee96A3")
+	salt, _ := hex.DecodeString("0000000000000000000000000000000000000000000000000000000000000001")
+	creationCode, _ := hex.DecodeString(TestAccountContractCreationCode) // look at create2_test.go
+
+	initCode := tbsdk.AbiEncodePacked(creationCode, tbsdk.AbiEncode(
+		owner,
+		ar,
+		ep,
+		factory,
+	))
+
+	address := tbsdk.ComputeCounterfactualAddress(factory, salt, initCode)
+
+	// https://mumbai.polygonscan.com/address/0xd40aeab1d9e7c57523c2f5381f79c9738a73fe2d#internaltx
+	deployedAddress := "0xd40aeab1d9e7c57523c2f5381f79c9738a73fe2d"
+
+	if address != deployedAddress {
+        panic("error")
+	}
 }
 
 ```
