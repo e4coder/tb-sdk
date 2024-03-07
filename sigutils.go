@@ -183,6 +183,6 @@ func signDataHashWithEthereumPrivateKey(dataToSign []byte, privateKeyECDSA *ecds
 
 	// TODO: fix +27 please!
 	// Encode the signature in Ethereum's compact signature format.
-	out := append(signature[:64], signature[64]+27)
+	out := append(signature[:64], signature[64]+27) //nolint:all
 	return out, nil
 }
