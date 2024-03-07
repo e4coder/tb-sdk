@@ -127,6 +127,17 @@ func (ob *OperationBuilder) Build() *PackedUserOp {
 	return packedOp
 }
 
+func (ob *OperationBuilder) BuildWithOperationHash(chainId *big.Int, entryPoint common.Address) (*PackedUserOp, []byte, error) {
+	packedOp := ob.Build()
+
+	uoData, err := GetUserOperationHash(packedOp, chainId.Int64(), entryPoint)
+	if err != nil {
+		return nil, nil, fmt.Errorf("err operationHash : %v", err)
+	}
+
+	return packedOp, uoData, nil
+}
+
 func (ob *OperationBuilder) BuildWithSignature(chainId *big.Int, entryPoint common.Address, privKey *ecdsa.PrivateKey) (*PackedUserOp, error) {
 	if chainId == nil {
 		return nil, fmt.Errorf("chainId <nil>")
@@ -136,25 +147,9 @@ func (ob *OperationBuilder) BuildWithSignature(chainId *big.Int, entryPoint comm
 		return nil, fmt.Errorf("privKey <nil>")
 	}
 
-	initCode := ob.Adapt(ADDRESS_PACKED_DATA_ADAPTER, ob.Operation.Factory, ob.Operation.FactoryData)
-	paymasterAndData := ob.Adapt(ADDRESS_PACKED_DATA_ADAPTER, ob.Operation.Paymaster, ob.Operation.PaymasterData)
-
-	packedOp := &PackedUserOp{
-		Sender:               ob.Adapt(ADDRESS_ADAPTER, ob.Operation.Sender),
-		Nonce:                ob.Adapt(BIG_INT_ADAPTER, ob.Operation.Nonce), // fixme
-		InitCode:             initCode,
-		CallData:             ob.Adapt(PACKED_DATA_ADAPTER, ob.Operation.CallData),
-		CallGasLimit:         ob.Adapt(BIG_INT_ADAPTER, ob.Operation.CallGasLimit),
-		VerificationGasLimit: ob.Adapt(BIG_INT_ADAPTER, ob.Operation.VerificationGasLimit),
-		PreVerificationGas:   ob.Adapt(BIG_INT_ADAPTER, ob.Operation.PreVerificationGas),
-		MaxFeePerGas:         ob.Adapt(BIG_INT_ADAPTER, ob.Operation.MaxFeePerGas),
-		MaxPriorityFeePerGas: ob.Adapt(BIG_INT_ADAPTER, ob.Operation.MaxPriorityFeePerGas),
-		PaymasterAndData:     paymasterAndData,
-	}
-
-	uoData, err := GetUserOperationHash(packedOp, chainId.Int64(), entryPoint)
+	packedOp, uoData, err := ob.BuildWithOperationHash(chainId, entryPoint)
 	if err != nil {
-		return nil, fmt.Errorf("err operationHash : %v", err)
+		return nil, err
 	}
 
 	sig, err := SignDataWithEthereumPrivateKey(uoData, privKey)
