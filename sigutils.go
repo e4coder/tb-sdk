@@ -179,7 +179,7 @@ func signDataHashWithEthereumPrivateKey(dataToSign []byte, privateKeyECDSA *ecds
 	if err != nil {
 		return nil, err
 	}
-	//return CompactSignature(signature)
+	// return CompactSignature(signature)
 
 	// TODO: fix +27 please!
 	// Encode the signature in Ethereum's compact signature format.
