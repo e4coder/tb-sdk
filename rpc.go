@@ -148,6 +148,24 @@ func (b *Bundler) Eth_getUserOperationReceipt(userOpHash string) (*RpcResponse, 
 	return response, nil
 }
 
+func (b *Bundler) Rundler_maxPriorityFeePerGas() (*RpcResponse, error) {
+	params := []interface{}{}
+
+	response, err := b._call("rundler_maxPriorityFeePerGas", params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		fmt.Println(response.Error)
+
+		return response, errors.New("rpc_error")
+	}
+
+	return response, nil
+}
+
 // TODO Debug_ implement namespace
 
 func (b *Bundler) Debug_clearState() {}
