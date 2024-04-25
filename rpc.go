@@ -76,8 +76,11 @@ func (b *Bundler) Eth_supportedEntryPoints() (*RpcResponse, error) {
 	return b._call("eth_supportedEntryPoints", params)
 }
 
-func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcResponse, error) {
-	params := []interface{}{userOp, b.EntryPoints[0]}
+func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp, entrypoint *common.Address) (*RpcResponse, error) {
+	if entrypoint == nil {
+		entrypoint = &b.EntryPoints[0]
+	}
+	params := []interface{}{userOp, *entrypoint}
 
 	response, err := b._call("eth_estimateUserOperationGas", params)
 
@@ -94,8 +97,11 @@ func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp) (*RpcRespon
 	return response, nil
 }
 
-func (b *Bundler) Eth_sendUserOperation(userOp *PackedUserOp) (*RpcResponse, error) {
-	params := []interface{}{userOp, b.EntryPoints[0]}
+func (b *Bundler) Eth_sendUserOperation(userOp *PackedUserOp, entrypoint *common.Address) (*RpcResponse, error) {
+	if entrypoint == nil {
+		entrypoint = &b.EntryPoints[0]
+	}
+	params := []interface{}{userOp, *entrypoint}
 
 	response, err := b._call("eth_sendUserOperation", params)
 
