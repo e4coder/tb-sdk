@@ -7,6 +7,7 @@ import (
 
 	tbsdk "github.com/e4coder/tb-sdk"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient/gethclient"
 )
 
 var Bundler tbsdk.Bundler = tbsdk.Bundler{
@@ -41,6 +42,7 @@ func TestSupportedEntryPoints(t *testing.T) {
 		t.Log(err)
 		t.FailNow()
 	}
+	Bundler.Eth_estimateUserOperationGas(tbsdk.NewOperationBuilder().Build(), &common.MaxAddress, map[common.Address]gethclient.OverrideAccount{})
 
 	entryPoints := &tbsdk.AddressArrayEntryPoints{}
 	err = tbsdk.DecodeResult(res.Result, entryPoints)

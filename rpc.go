@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient/gethclient"
 )
 
 type Bundler struct {
@@ -76,11 +77,17 @@ func (b *Bundler) Eth_supportedEntryPoints() (*RpcResponse, error) {
 	return b._call("eth_supportedEntryPoints", params)
 }
 
-func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp, entrypoint *common.Address) (*RpcResponse, error) {
+func (b *Bundler) Eth_estimateUserOperationGas(userOp *PackedUserOp, entrypoint *common.Address, stateOverrideSet map[common.Address]gethclient.OverrideAccount) (*RpcResponse, error) {
 	if entrypoint == nil {
 		entrypoint = &b.EntryPoints[0]
 	}
-	params := []interface{}{userOp, *entrypoint}
+
+	var params []interface{}
+	if stateOverrideSet != nil {
+		params = []interface{}{userOp, *entrypoint, stateOverrideSet}
+	} else {
+		params = []interface{}{userOp, *entrypoint}
+	}
 
 	response, err := b._call("eth_estimateUserOperationGas", params)
 
