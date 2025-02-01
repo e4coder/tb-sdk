@@ -6,6 +6,7 @@ import (
 
 	"github.com/e4coder/tb-sdk/adapters"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type UnpackedUserOperation struct {
@@ -57,6 +58,75 @@ type PackedUserOperation struct {
 	Signature          string          `json:"signature"`
 }
 
+const DUMMY_SIGNATURE = "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c"
+
+func (op *PackedUserOperation) ToUnpackedUserOperation() UnpackedUserOperation {
+	// decode initCode    ->   initCode[:20] = facotry, initCode[20:] = factoryData
+	var factory *common.Address = nil
+	var factoryData []byte = []byte{}
+	if len(op.InitCode) != 0 {
+		if len(op.InitCode) >= 20 {
+			_factory := common.BytesToAddress(op.InitCode[:20])
+			factory = &_factory
+			factoryData = op.InitCode[20:]
+		}
+	}
+
+	// decode accountGasLimits   -> accountGasLimits[:16] = verificationGasLimit, accountGasLimits[16:] = callGasLimit
+	var verificationGasLimit *big.Int = nil
+	var callGasLimit *big.Int = nil
+	if len(op.AccountGasLimits) == 32 {
+		verificationGasLimit = big.NewInt(0).SetBytes(op.AccountGasLimits[:16])
+		callGasLimit = big.NewInt(0).SetBytes(op.AccountGasLimits[16:])
+	}
+
+	// decode GasFees    ->   GasFees[:16] = maxPriorityFeePerGas, GasFees[16:] = maxFeePerGas
+	var maxPriorityFeePerGas *big.Int = nil
+	var maxFeePerGas *big.Int = nil
+	if len(op.GasFees) == 32 {
+		maxPriorityFeePerGas = big.NewInt(0).SetBytes(op.GasFees[:16])
+		maxFeePerGas = big.NewInt(0).SetBytes(op.GasFees[16:])
+	}
+
+	// decode PaymasterAndData
+	// PaymasterAndData[:20] = paymaster
+	// PaymasterAndData[20:36] = validationGasLimit
+	// PaymasterAndData[36:52] = postOpLimit
+	// PaymasterAndData[52:] = paymasterData
+	var paymaster *common.Address = nil
+	var paymasterVerificationGasLimit *big.Int = nil
+	var paymasterPostOpGasLimit *big.Int = nil
+	var paymasterData []byte = []byte{}
+	if len(op.PaymasterAndData) != 0 {
+		if len(op.PaymasterAndData) >= 52 {
+			_paymaster := common.BytesToAddress(op.PaymasterAndData[:20])
+			paymaster = &_paymaster
+			paymasterVerificationGasLimit = big.NewInt(0).SetBytes(op.PaymasterAndData[20:36])
+			paymasterPostOpGasLimit = big.NewInt(0).SetBytes(op.PaymasterAndData[36:52])
+			paymasterData = op.PaymasterAndData[52:]
+		}
+	}
+
+	return UnpackedUserOperation{
+		Sender:                        op.Sender,
+		Nonce:                         op.Nonce,
+		CallData:                      op.CallData,
+		CallGasLimit:                  callGasLimit,
+		VerificationGasLimit:          verificationGasLimit,
+		PreVerificationGas:            op.PreVerificationGas,
+		MaxPriorityFeePerGas:          maxPriorityFeePerGas,
+		MaxFeePerGas:                  maxFeePerGas,
+		Factory:                       factory,
+		FactoryData:                   factoryData,
+		Paymaster:                     paymaster,
+		PaymasterVerificationGasLimit: paymasterVerificationGasLimit,
+		PaymasterPostOpGasLimit:       paymasterPostOpGasLimit,
+		PaymasterData:                 paymasterData,
+		SignatureType:                 "0x00",
+		Signature:                     DUMMY_SIGNATURE,
+	}
+}
+
 func (op *PackedUserOperation) ToPackedUserOperationString() PackedUserOperationString {
 	pHex := PackedUserOperationString{
 		Sender:             adapters.Adapt(adapters.ADDRESS_ADAPTER, op.Sender),
@@ -94,4 +164,30 @@ type PackedUserOperationString struct {
 	GasFees            string `json:"gasFees"`
 	PaymasterAndData   string `json:"paymasterAndData"`
 	Signature          string `json:"signature"`
+}
+
+func (pOp *PackedUserOperationString) ToPackedUserOperation() (PackedUserOperation, error) {
+	sender := common.HexToAddress(pOp.Sender)
+	nonce, err := hexutil.DecodeBig(pOp.Nonce)
+	initCode, err := hexutil.Decode(pOp.InitCode)
+	callData, err := hexutil.Decode(pOp.CallData)
+	accountGasLimits, err := hexutil.Decode(pOp.AccountGasLimits)
+	preVerificationGas, err := hexutil.DecodeBig(pOp.PreVerificationGas)
+	paymasterAndData, err := hexutil.Decode(pOp.PaymasterAndData)
+	signature := pOp.Signature
+
+	if err != nil {
+		return PackedUserOperation{}, err
+	}
+
+	return PackedUserOperation{
+		Sender:             &sender,
+		Nonce:              nonce,
+		InitCode:           initCode,
+		CallData:           callData,
+		AccountGasLimits:   accountGasLimits,
+		PreVerificationGas: preVerificationGas,
+		PaymasterAndData:   paymasterAndData,
+		Signature:          signature,
+	}, nil
 }
