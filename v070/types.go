@@ -57,8 +57,8 @@ type PackedUserOperation struct {
 	Signature          string          `json:"signature"`
 }
 
-func (op PackedUserOperation) String() string {
-	pHex := packedUserOperationString{
+func (op *PackedUserOperation) ToPackedUserOperationString() PackedUserOperationString {
+	pHex := PackedUserOperationString{
 		Sender:             adapters.Adapt(adapters.ADDRESS_ADAPTER, op.Sender),
 		Nonce:              adapters.Adapt(adapters.BIG_INT_ADAPTER, op.Nonce),
 		InitCode:           adapters.Adapt(adapters.PACKED_DATA_ADAPTER, op.InitCode),
@@ -70,6 +70,12 @@ func (op PackedUserOperation) String() string {
 		Signature:          op.Signature,
 	}
 
+	return pHex
+}
+
+func (op PackedUserOperation) String() string {
+	pHex := op.ToPackedUserOperationString()
+
 	jOp, err := json.MarshalIndent(pHex, "", "  ")
 	if err != nil {
 		return err.Error()
@@ -78,8 +84,8 @@ func (op PackedUserOperation) String() string {
 	return string(jOp)
 }
 
-type packedUserOperationString struct {
-	Sender             string `json:"address"`
+type PackedUserOperationString struct {
+	Sender             string `json:"sender"`
 	Nonce              string `json:"nonce"`
 	InitCode           string `json:"initCode"`
 	CallData           string `json:"callData"`

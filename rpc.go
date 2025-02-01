@@ -115,7 +115,7 @@ type Eth_estimateUserOperationGasResponse struct {
 	PaymasterPostOpGasLimit       *big.Int `json:"paymasterPostOpGasLimit"`
 	PaymasterVerificationGasLimit *big.Int `json:"paymasterVerificationGasLimit"`
 	PreVerificationGas            *big.Int `json:"preVerificationGas"`
-	VerificationGasLimit          *big.Int `json:"preVerificationGas"`
+	VerificationGasLimit          *big.Int `json:"verificationGasLimit"`
 }
 
 func (b *Bundler) Eth_estimateUserOperationGas_v070(userOp *v070.RpcUnpackedUserOperation, entrypoint *common.Address, stateOverrideSet map[common.Address]gethclient.OverrideAccount) (*RpcResponse, *Eth_estimateUserOperationGasResponse, error) {
