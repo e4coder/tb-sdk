@@ -173,6 +173,7 @@ func (pOp *PackedUserOperationString) ToPackedUserOperation() (PackedUserOperati
 	callData, err := hexutil.Decode(pOp.CallData)
 	accountGasLimits, err := hexutil.Decode(pOp.AccountGasLimits)
 	preVerificationGas, err := hexutil.DecodeBig(pOp.PreVerificationGas)
+	gasFees, err := hexutil.Decode(pOp.GasFees)
 	paymasterAndData, err := hexutil.Decode(pOp.PaymasterAndData)
 	signature := pOp.Signature
 
@@ -187,6 +188,7 @@ func (pOp *PackedUserOperationString) ToPackedUserOperation() (PackedUserOperati
 		CallData:           callData,
 		AccountGasLimits:   accountGasLimits,
 		PreVerificationGas: preVerificationGas,
+		GasFees:            gasFees,
 		PaymasterAndData:   paymasterAndData,
 		Signature:          signature,
 	}, nil
